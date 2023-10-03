@@ -1,0 +1,25 @@
+{
+  "name": "nodejs-hw1",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node index.js",
+    "dev": "nodemon index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Marstepan12/NodeJS-Hw1.git"
+  },
+  "author": "Marstepan12",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Marstepan12/NodeJS-Hw1/issues"
+  },
+  "homepage": "https://github.com/Marstepan12/NodeJS-Hw1#readme",
+  "dependencies": {
+    "nodemon": "^3.0.1",
+    "yargs": "^17.7.2"
+  }
+}
