@@ -1,57 +1,46 @@
-const fs = require('fs/promises');
-const path = require('path');
+const fs = require("fs/promises");
+const path = require("path");
+const crypto = require("crypto");
 
-const contactsPath = path.join(__dirname, 'db', 'contacts.json');
+const contactsPath = path.join(process.cwd(), "db", "contacts.json");
 
-function listContacts() {
-  return fs.readFile(contactsPath, 'utf-8')
-    .then(data => JSON.parse(data))
-    .catch(error => {
-      console.error('Error reading contacts:', error);
-      return [];
-    });
-}
+const listContacts = async () => {
+  const contacts = await fs.readFile(contactsPath);
+  return JSON.parse(contacts);
+};
 
-function getContactById(contactId) {
-  return fs.readFile(contactsPath, 'utf-8')
-    .then(data => {
-      const contacts = JSON.parse(data);
-      return contacts.find(contact => contact.id === contactId) || null;
-    })
-    .catch(error => {
-      console.error('Error reading contacts:', error);
-      return null;
-    });
-}
+const getContactById = async (contactId) => {
+  const contacts = await listContacts();
+  const contact = contacts.find((contact) => contact.id === contactId);
+  if (!contact) {
+    throw new Error("Contact not found");
+  }
+  return contact;
+};
 
-function removeContact(contactId) {
-  return fs.readFile(contactsPath, 'utf-8')
-    .then(data => {
-      const contacts = JSON.parse(data);
-      const removedContact = contacts.find(contact => contact.id === contactId);
-      const updatedContacts = contacts.filter(contact => contact.id !== contactId);
-      return fs.writeFile(contactsPath, JSON.stringify(updatedContacts))
-        .then(() => removedContact);
-    })
-    .catch(error => {
-      console.error('Error reading/writing contacts:', error);
-      return null;
-    });
-}
+const removeContact = async (contactId) => {
+  const contacts = await listContacts();
+  const index = contacts.findIndex((contact) => contact.id === contactId);
+  if (!index) {
+    throw new Error("Contact not found");
+  }
+  const [contact] = contacts.splice(index, 1);
 
-function addContact(name, email, phone) {
-  return fs.readFile(contactsPath, 'utf-8')
-    .then(data => {
-      const contacts = JSON.parse(data);
-      const newContact = { id: contacts.length + 1, name, email, phone };
-      contacts.push(newContact);
-      return fs.writeFile(contactsPath, JSON.stringify(contacts))
-        .then(() => newContact);
-    })
-    .catch(error => {
-      console.error('Error reading/writing contacts:', error);
-      return null;
-    });
-}
+  await fs.writeFile(contactsPath, JSON.stringify(contacts, null, 2));
+  return contact;
+};
+
+const addContact = async (name, email, phone) => {
+  const contacts = await listContacts();
+  const newContact = {
+    id: crypto.randomUUID(),
+    name,
+    email,
+    phone,
+  };
+  contacts.push(newContact);
+  await fs.writeFile(contactsPath, JSON.stringify(contacts, null, 2));
+  return newContact;
+};
 
 module.exports = { listContacts, getContactById, removeContact, addContact };
